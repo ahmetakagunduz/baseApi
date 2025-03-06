@@ -6,7 +6,7 @@ class Response {
   }
 
   success(res) {
-    return res.status(this.status || 200).json({
+    return res.status(200).json({
       success: true,
       data: this.data,
       message: this.message ?? "Success",
@@ -14,7 +14,7 @@ class Response {
   }
 
   created(res) {
-    return res.status(this.status || 201).json({
+    return res.status(201).json({
       success: true,
       data: this.data,
       message: this.message ?? "Created",
