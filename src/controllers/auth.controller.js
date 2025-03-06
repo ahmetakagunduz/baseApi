@@ -1,39 +1,44 @@
 const user = require('../models/user.model');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
+const APIError = require('../utils/errors');
+const Response = require('../utils/response');
+
+
+const login = async (req, res) => {
+    console.log('req.body');
+}
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+    const { email } = req.body;
 
-  try {
-    // Kullanıcı var mı kontrolü
     const userCheck = await user.findOne({ email });
+
     if (userCheck) {
-      return res.status(400).json({ message: 'User already exists' });
+        throw APIError(400, 'User already exists');
+        
     }
+    const newUser = new user(req.body);
+    req.body.password = await bcrypt.hash(req.body.password, 10);
+    console.log("hash password:",req.body.password);
 
-    // Şifreyi hash'le
-    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const userSave = new user(req.body);
 
-    // Yeni kullanıcıyı oluştur ve kaydet
-    const userSave = new user({
-      ...req.body,
-      password: hashedPassword
-    });
+    await userSave.save()
+            .then(data => {
+                return new Response(data, 200, 'User saved successfully').created(res);
+            })
+            .catch((error) => {
+                throw APIError("user could not be saved", 400);
+            });
+    
 
-    await userSave.save();
-    return res.status(201).json({
-      success: true,
-      data: userSave,
-      message: 'User created successfully',
-    });
 
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-};
 
-module.exports = { register };
+
+}
+
+module.exports = {
+    login,
+    register
+}
