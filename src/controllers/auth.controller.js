@@ -5,6 +5,19 @@ const Response = require("../utils/response");
 
 const login = async (req, res) => {
     console.log(req.body);
+    const { email, password } = req.body
+    const userCheck = await user.findOne({ email })
+
+    console.log("userCheck : ", userCheck);
+    if (!userCheck) {
+        throw new APIError("wrong email or password", 404)
+    }
+    const passwordCheck = await bcrypt.compare(password, userCheck.password)
+    console.log("passwordCheck : ", passwordCheck);
+    console.log("userCheck.password : ", userCheck.password);
+    if (!passwordCheck) {
+        throw new APIError("wrong email or password", 404)
+    }
 
     return res.json(req.body)
 }
