@@ -2,6 +2,7 @@ const user = require("../models/user.model")
 const bcrypt = require("bcrypt");
 const APIError = require("../utils/errors");
 const Response = require("../utils/response");
+const { createToken } = require("../middlewares/auth");
 
 const login = async (req, res) => {
     console.log(req.body);
@@ -10,13 +11,14 @@ const login = async (req, res) => {
 
     console.log("userCheck : ", userCheck);
     if (!userCheck) {
-        throw new APIError("wrong email or password", 404)
+        throw new APIError("wrong email or password", 401)
     }
     const passwordCheck = await bcrypt.compare(password, userCheck.password)
     console.log("passwordCheck : ", passwordCheck);
     console.log("userCheck.password : ", userCheck.password);
     if (!passwordCheck) {
-        throw new APIError("wrong email or password", 404)
+        throw new APIError("wrong email or password", 401)
+    createToken(userCheck, res)
     }
 
     return res.json(req.body)
