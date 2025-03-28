@@ -21,8 +21,21 @@ const createToken = async (user, res) => {
     })
 }
 
+const verifyToken = async (req, res, next) => {
+    const headerToken = req.headers.authorization && req.headers.authorization.startsWith("Bearer ")
+   
+    if (!headerToken) 
+        throw new APIError("Token not found", 401)
+    const token = req.headers.authorization.split(" ")[1]
+    console.log(token);
+    
+    next();
+    
+}
 
 
-    module.exports = {
+
+module.exports = {
         createToken,
+        verifyToken,
     }
