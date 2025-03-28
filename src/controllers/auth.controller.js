@@ -51,7 +51,7 @@ const register = async (req, res) => {
 }
 
 const me = async (req, res) => { 
-    console.log("inside me function");
+    return new Response(req.user, "user found").success(res)
 }
 
 module.exports = {

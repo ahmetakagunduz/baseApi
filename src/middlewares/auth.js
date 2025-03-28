@@ -1,10 +1,8 @@
 const jwt = require('jsonwebtoken');
+const user = require("../models/user.model")
 
 const createToken = async (user, res) => {
-    console.log(user);
-
     
-
     const payload = {
         sub: user._id,
         name: user.name,
@@ -27,10 +25,19 @@ const verifyToken = async (req, res, next) => {
     if (!headerToken) 
         throw new APIError("Token not found", 401)
     const token = req.headers.authorization.split(" ")[1]
-    console.log(token);
     
-    next();
+
+    await jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+        if (err) throw new APIError("Token not valid", 401)
+        const userCheck = await user.findById(decoded.sub).select("_id name lastname email")
     
+
+    if (!userCheck) throw new APIError("User not found", 401)
+    
+        req.user = userCheck
+        next();
+
+    })        
 }
 
 
